@@ -1,0 +1,234 @@
+\documentclass[aspectratio=169,11pt]{ctexbeamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{hyperref}
+
+\title[水彩风景 LoRA 微调]{Stable Diffusion v1.5 水彩风景 LoRA 微调}
+\subtitle{课程大作业开题汇报}
+\author{第 10 周周三开题汇报}
+\date{2026 年 5 月 6 日}
+
+\newcommand{\img}[2]{\includegraphics[width=#1,keepaspectratio]{#2}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{选题与研究目标}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.58\textwidth}
+      \begin{itemize}
+        \item 选题：使用 LoRA 微调 Stable Diffusion v1.5，生成稳定的水彩风景插画。
+        \item 目标风格：山水、湖泊、小船、森林、小镇、桥、花草等水彩风景。
+        \item 核心问题：基础模型只靠 \texttt{watercolor style} prompt 时，风格不稳定。
+        \item 目标输出：提升水彩风格一致性，同时保留 prompt 控制能力和生成多样性。
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \centering
+      \img{0.95\linewidth}{assets/beamer/examples/overall.jpg}
+
+      \vspace{0.3em}
+      {\scriptsize 数据集整体方向示例：水彩风景}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{为什么需要微调：Base 生成不稳定}
+  \centering
+  \begin{tabular}{ccccc}
+    \img{0.18\linewidth}{assets/beamer/base/01_seed-42_watercolor-style-a-small-boat-on-a-mountain-lake.png} &
+    \img{0.18\linewidth}{assets/beamer/base/02_seed-42_watercolor-style-a-misty-lake-after-rain.png} &
+    \img{0.18\linewidth}{assets/beamer/base/03_seed-42_watercolor-style-a-quiet-village-with-a-stone-bridge.png} &
+    \img{0.18\linewidth}{assets/beamer/base/04_seed-42_watercolor-style-pine-trees-beside-a-lake-at-sunset.png} &
+    \img{0.18\linewidth}{assets/beamer/base/05_seed-42_watercolor-style-wildflowers-beside-a-peaceful-river.png}
+  \end{tabular}
+
+  \vspace{0.6em}
+  \begin{itemize}
+    \item SD v1.5 Base 能理解主体，例如小船、桥、花草、湖泊。
+    \item 但水彩风格不稳定：部分结果偏摄影写实，尤其是雾景、森林日落场景。
+    \item LoRA 微调的目标是让风格从“偶然出现”变为“稳定生成”。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{数据集结构：公共 90 张 + 个人 10 张}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \textbf{公共数据集：90 张}
+      \begin{itemize}
+        \item 山水湖泊风景：35 张
+        \item 河流、小船、码头：15 张
+        \item 乡村建筑、小镇、桥：15 张
+        \item 森林、树木、岸边：15 张
+        \item 天空、云、日落、雾景：10 张
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{每位成员：10 张微主题数据}
+      \begin{itemize}
+        \item 每人训练集：公共 90 张 + 自己 10 张。
+        \item 全组实际收集：90 + 5 $\times$ 10 = 140 张。
+        \item 目的：保持统一水彩风景主风格，同时体现个人数据的影响。
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{5 名成员个人数据规划}
+  \small
+  \begin{tabularx}{\textwidth}{>{\bfseries}c X X}
+    \toprule
+    成员 & 个人 10 张主题 & 预期影响 \\
+    \midrule
+    A & 山湖 + 小船 & 更容易生成湖泊、小船、清晰倒影 \\
+    B & 雾景 + 雨后氛围 & 更柔和、低对比，有雾气和雨后氛围 \\
+    C & 小镇 + 建筑 + 桥 & 更容易出现房屋、桥、小镇街道 \\
+    D & 森林 + 松树 + 粉紫日落 & 更容易出现深色树影、粉紫天空、夕阳氛围 \\
+    E & 植物 + 花草 + 近景自然 & 前景更丰富，更容易出现花草和自然细节 \\
+    \bottomrule
+  \end{tabularx}
+
+  \vspace{0.8em}
+  \begin{block}{设计原则}
+    个人 10 张不是随机补充，而是在同一水彩风景大方向下引入可观察的微主题偏移。
+  \end{block}
+\end{frame}
+
+\begin{frame}{数据集示例图}
+  \centering
+  \begin{tabular}{cccccc}
+    \img{0.155\linewidth}{assets/beamer/examples/overall.jpg} &
+    \img{0.155\linewidth}{assets/beamer/examples/member_a_boat_lake.jpg} &
+    \img{0.155\linewidth}{assets/beamer/examples/member_b_rain_mist.jpg} &
+    \img{0.155\linewidth}{assets/beamer/examples/member_c_bridge_village.jpg} &
+    \img{0.155\linewidth}{assets/beamer/examples/member_d_pine_sunset.jpg} &
+    \img{0.155\linewidth}{assets/beamer/examples/member_e_flowers_river.jpg} \\
+    {\scriptsize 公共} & {\scriptsize A:船湖} & {\scriptsize B:雾雨} &
+    {\scriptsize C:桥镇} & {\scriptsize D:松树日落} & {\scriptsize E:花草}
+  \end{tabular}
+
+  \vspace{0.8em}
+  \begin{itemize}
+    \item 示例图来自公开图像来源，用于说明收集方向；正式训练集会人工筛选和裁剪。
+    \item 数据来源优先选择 Public Domain / CC0 / 明确开放授权图片。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{统一标注与数据处理}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.50\textwidth}
+      \textbf{人工完成}
+      \begin{itemize}
+        \item 人工筛图：保证水彩风景主风格。
+        \item 人工裁剪：保留主体、构图、纸张纹理。
+        \item 人工抽查：检查自动 caption 是否准确。
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \textbf{Codex 自动化}
+      \begin{itemize}
+        \item 文件编号与目录整理。
+        \item 生成 \texttt{dataset\_manifest.csv}。
+        \item 批量生成 caption。
+        \item 检查缺失字段和主题归属。
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.8em}
+  \textbf{统一 caption 格式：}
+
+  \vspace{0.3em}
+  \texttt{watercolor landscape style, [subject description]}
+\end{frame}
+
+\begin{frame}{训练方案}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \textbf{模型与方法}
+      \begin{itemize}
+        \item Base：Stable Diffusion v1.5
+        \item 方法：LoRA 风格微调
+        \item 分辨率：512 $\times$ 512
+        \item 资源规划：单张 RTX 4090
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{实验模型}
+      \begin{itemize}
+        \item Group90：公共 90 张
+        \item A100/B100/C100/D100/E100：公共 90 + 个人 10
+        \item 保存 checkpoint：500/1000/1500/2000 step
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.8em}
+  \begin{block}{选择最终模型}
+    不选训练步数最高的 checkpoint，而选风格一致性、prompt 一致性和多样性最平衡的 checkpoint。
+  \end{block}
+\end{frame}
+
+\begin{frame}{评估指标与个人影响分析}
+  \small
+  \begin{tabularx}{\textwidth}{l X}
+    \toprule
+    指标 & 作用 \\
+    \midrule
+    CLIP Score & 衡量生成图是否符合 prompt，检查文本控制能力是否下降 \\
+    Style Similarity & 衡量生成图是否接近水彩训练集风格，是本项目核心指标 \\
+    Diversity & 检查 LoRA 是否导致构图重复或模式坍缩 \\
+    Nearest Neighbor & 检查生成图是否过度接近训练图，排查过拟合 \\
+    Personal Influence Score & 比较个人模型和 Group90 是否更接近该成员的个人 10 张数据 \\
+    \bottomrule
+  \end{tabularx}
+
+  \vspace{0.8em}
+  \[
+  \text{Influence} =
+  \text{sim}(\text{personal output}, \text{personal centroid})
+  - \text{sim}(\text{Group90 output}, \text{personal centroid})
+  \]
+\end{frame}
+
+\begin{frame}{组内分工与实施计划}
+  \small
+  \begin{tabularx}{\textwidth}{l X}
+    \toprule
+    阶段 & 工作内容 \\
+    \midrule
+    数据收集 & 公共 90 张由全组共同完成；每人负责自己的 10 张微主题数据 \\
+    数据处理 & 人工裁剪；Codex 自动生成 caption 与 manifest；人工抽查 \\
+    训练实验 & 先训练 Group90，再训练 A100--E100，并保存多个 checkpoint \\
+    对比生成 & 使用 5 个固定个人主题 prompt，对 Base、Group90、个人模型做对比 \\
+    指标评估 & 计算 CLIP Score、Style Similarity、Diversity、Nearest Neighbor、Personal Influence \\
+    报告撰写 & 汇总图像对比、指标表格、过拟合分析和个人数据影响分析 \\
+    \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{阶段性结论}
+  \begin{itemize}
+    \item 选题已确定：Stable Diffusion v1.5 的水彩风景 LoRA 微调。
+    \item 数据集方案已确定：公共 90 张 + 每人 10 张微主题数据。
+    \item 当前 Base 测试说明：基础模型主体理解较好，但水彩风格稳定性不足。
+    \item 后续重点：收集高质量水彩风景数据，训练 LoRA，并分析个人 10 张数据对生成结果的影响。
+  \end{itemize}
+
+  \vfill
+  \centering
+  \Large 谢谢
+\end{frame}
+
+\end{document}
