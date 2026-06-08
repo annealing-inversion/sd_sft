@@ -1,74 +1,23 @@
-# SDXL PTI + LoRA Training
+# SDXL PTI + LoRA Script Reference
 
-This directory contains the project training entrypoints.
+这里是脚本层面的说明。项目总览和推荐命令见仓库根目录 `README.md`，数据集规范见 `docs/datasets.md`。
 
-## Setup
+## Entrypoints
 
-```bash
-bash scripts/setup_conda_env.sh
-bash scripts/download_sdxl_base.sh
-```
+| 文件 | 用途 |
+|---|---|
+| `run_sdxl_pti_lora_single.sh` | 正式单风格多 GPU 训练入口 |
+| `run_sdxl_pti_lora_smoke.sh` | 本地或远程小训练 smoke test |
+| `train_sdxl_pti_lora.py` | 实际训练实现 |
 
-Both scripts can be redirected for a remote NAS install:
+## 训练流程
 
-```bash
-CONDA_ENV_PREFIX=/mnt/nas-new/valencia/sdxl-style-lora/.conda/sdxl-lora \
-  bash scripts/setup_conda_env.sh
+`train_sdxl_pti_lora.py` 分两阶段：
 
-MODEL_DIR=/mnt/nas-new/valencia/sdxl-style-lora/models/sdxl-base-1.0 \
-  bash scripts/download_sdxl_base.sh
-```
+1. PTI/Textual Inversion warmup：只训练新的 placeholder token 在 SDXL 两个 text encoder 里的 embedding。
+2. LoRA stage：冻结或可选继续训练 token，然后训练 UNet LoRA；正式配置还会训练 text encoder LoRA。
 
-## Formal single-style training
-
-The default launcher assumes at least 3 GPUs with 24GB VRAM each.
-
-```bash
-STYLE=jojo DATA_DIR=data/jojo NUM_PROCESSES=3 \
-  bash training_scripts/run_sdxl_pti_lora_single.sh
-```
-
-Expected dataset layout:
-
-```text
-data/jojo/
-  001.png
-  001.txt
-  002.png
-  002.txt
-```
-
-If a matching `.txt` file is absent, the launcher uses:
-
-```text
-<style_headshot>, anime portrait, close-up face, character headshot
-```
-
-The default route is:
-
-- SDXL base fp16 from `models/sdxl-base-1.0`
-- 1024 x 1024
-- batch size 1 per GPU
-- gradient accumulation 4
-- 500 TI-only steps
-- 2000 total steps
-- LoRA rank 16
-- UNet LoRA plus text-encoder LoRA
-
-## Local smoke test
-
-This only checks that the training path runs and saves artifacts.
-
-```bash
-bash training_scripts/run_sdxl_pti_lora_smoke.sh
-```
-
-It uses the existing `data/` directory, 256 x 256 images, 1 TI step and 1 LoRA
-step. Do not use the smoke output as a quality signal.
-
-## Outputs
-
-Each training run writes:
+最终输出：
 
 ```text
 outputs/sdxl_lora/<style>/
@@ -76,69 +25,135 @@ outputs/sdxl_lora/<style>/
   learned_embeds.safetensors
   training_config.json
   training_metadata.json
-  checkpoint-*/...
+  checkpoint-200/
+  checkpoint-400/
+  ...
 ```
 
-## Generate from a trained LoRA
+## 默认正式配置
+
+`run_sdxl_pti_lora_single.sh` 默认假设至少 3 张 24GB GPU：
+
+| 参数 | 默认值 |
+|---|---:|
+| resolution | 1024 |
+| train batch size per GPU | 1 |
+| gradient accumulation | 4 |
+| max train steps | 2000 |
+| TI/PTI steps | 500 |
+| checkpoint interval | 200 |
+| LoRA rank / alpha | 16 / 16 |
+| UNet LoRA lr | `1e-4` |
+| text encoder LoRA lr | `5e-6` |
+| TI lr | `5e-4` |
+| precision | fp16 |
+
+## 当前三个风格
+
+直接运行 `bash training_scripts/run_sdxl_pti_lora_single.sh` 时默认训练 `ghibli`。其他风格建议显式指定：
+
+```bash
+STYLE=ghibli \
+DATA_DIR=data/Ghibli \
+OUTPUT_DIR=outputs/sdxl_lora/ghibli \
+PLACEHOLDER_TOKEN='<ghibli_headshot>' \
+NUM_PROCESSES=3 \
+MAIN_PROCESS_PORT=29501 \
+  bash training_scripts/run_sdxl_pti_lora_single.sh
+```
+
+```bash
+STYLE=persona_5 \
+DATA_DIR=data/persona_5 \
+OUTPUT_DIR=outputs/sdxl_lora/persona_5 \
+PLACEHOLDER_TOKEN='<persona_5_headshot>' \
+NUM_PROCESSES=3 \
+MAIN_PROCESS_PORT=29502 \
+  bash training_scripts/run_sdxl_pti_lora_single.sh
+```
+
+```bash
+STYLE=eva_rei \
+DATA_DIR=data/EVA_rei \
+OUTPUT_DIR=outputs/sdxl_lora/eva_rei \
+PLACEHOLDER_TOKEN='<eva_rei_headshot>' \
+NUM_PROCESSES=3 \
+MAIN_PROCESS_PORT=29503 \
+  bash training_scripts/run_sdxl_pti_lora_single.sh
+```
+
+`STYLE` 只影响默认路径。token 大小写要显式写对，尤其 `data/Ghibli` 和 `data/EVA_rei` 的目录名不是最终 token 的大小写。
+
+## Dataset Assumptions
+
+训练脚本读取：
+
+```text
+data/<style>/
+  image_0001.jpg
+  image_0001.txt
+```
+
+如果 `.txt` 缺失，会使用 `DEFAULT_CAPTION`。如果 caption 中没有 placeholder token，脚本会自动加在开头。
+
+`metadata.csv` 不参与训练，只是审查记录。
+
+## Smoke Test
+
+```bash
+bash training_scripts/run_sdxl_pti_lora_smoke.sh
+```
+
+smoke test 默认 256 分辨率、2 个 step，只验证代码路径和 artifact 保存。它不验证最终质量。
+
+## Direct Python Call
+
+需要临时改参数时可以绕过 shell：
+
+```bash
+.conda/sdxl-lora/bin/python training_scripts/train_sdxl_pti_lora.py \
+  --pretrained-model-name-or-path models/sdxl-base-1.0 \
+  --data-dir data/EVA_rei \
+  --output-dir outputs/sdxl_lora/eva_rei_debug \
+  --placeholder-token '<eva_rei_headshot>' \
+  --initializer-token style \
+  --resolution 768 \
+  --center-crop \
+  --train-batch-size 1 \
+  --gradient-accumulation-steps 1 \
+  --max-train-steps 50 \
+  --ti-steps 10 \
+  --rank 8 \
+  --lora-alpha 8 \
+  --learning-rate 1e-4 \
+  --mixed-precision fp16
+```
+
+## Generation and Merge
+
+生成脚本在 `scripts/generate_sdxl_lora.py`：
 
 ```bash
 .conda/sdxl-lora/bin/python scripts/generate_sdxl_lora.py \
-  --lora-dir outputs/sdxl_lora/jojo \
-  --output-dir outputs/sdxl_lora_eval/jojo \
-  --prompt "<jojo_headshot>, anime portrait, close-up face, clean line art" \
-  --seeds 7 42
+  --model-dir models/sdxl-base-1.0 \
+  --lora-dir outputs/sdxl_lora/eva_rei \
+  --output-dir outputs/eval_eva_rei \
+  --prompt "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes" \
+  --seeds 501 502 \
+  --lora-scale 0.65
 ```
 
-## Merge style LoRAs
-
-The default merge method is `concat`: it preserves the weighted sum of LoRA
-updates by stacking ranks. Two rank-16 LoRAs become one rank-32 LoRA; five
-rank-16 LoRAs become one rank-80 LoRA. By default, the learned trigger-token
-embeddings are averaged into one new trigger token.
-
-```bash
-.conda/sdxl-lora/bin/python scripts/merge_sdxl_loras.py \
-  --lora-dir outputs/sdxl_lora/jojo \
-  --lora-dir outputs/sdxl_lora/bocchi \
-  --weight 0.5 \
-  --weight 0.5 \
-  --output-dir outputs/sdxl_lora/merged_jojo_bocchi \
-  --placeholder-token "<merged_headshot>"
-```
-
-Then generate from the merged adapter:
-
-```bash
-.conda/sdxl-lora/bin/python scripts/generate_sdxl_lora.py \
-  --lora-dir outputs/sdxl_lora/merged_jojo_bocchi \
-  --output-dir outputs/sdxl_lora_eval/merged_jojo_bocchi \
-  --prompt "<merged_headshot>, anime portrait, close-up face, clean line art"
-```
-
-To keep each input LoRA trigger token while still merging the LoRA weights, use
-`--embed-merge keep`:
+合并脚本在 `scripts/merge_sdxl_loras.py`。当前推荐 multi-token merge：
 
 ```bash
 .conda/sdxl-lora/bin/python scripts/merge_sdxl_loras.py \
   --lora-dir outputs/sdxl_lora/ghibli \
   --lora-dir outputs/sdxl_lora/persona_5 \
   --lora-dir outputs/sdxl_lora/eva_rei \
-  --output-dir outputs/sdxl_lora/merged_multitoken \
+  --output-dir outputs/sdxl_lora/merged_multitoken_ghibli_persona5_eva_rei_equal \
   --method concat \
-  --embed-merge keep
+  --embed-merge keep \
+  --save-dtype float16
 ```
 
-The merged adapter can then use the original tokens in prompts:
-
-```bash
-.conda/sdxl-lora/bin/python scripts/generate_sdxl_lora.py \
-  --lora-dir outputs/sdxl_lora/merged_multitoken \
-  --output-dir outputs/sdxl_lora_eval/merged_multitoken \
-  --prompt "<ghibli_headshot>, anime portrait, close-up face, clean line art" \
-  --prompt "<persona_5_headshot>, anime portrait, close-up face, clean line art" \
-  --prompt "<eva_rei_headshot>, anime portrait, close-up face, clean line art"
-```
-
-For report experiments, start with pairwise merges and compare multiple
-`--lora-scale` values such as `0.4`, `0.6`, and `0.8`. Merging many strong style
-LoRAs at once often washes out identity or produces noisy style conflicts.
+`concat` 会增加 rank，但更忠实地保留多个 LoRA 的加权增量。`--embed-merge keep` 保留每个输入 LoRA 的原始触发词。

@@ -3,6 +3,12 @@
 __pycache__/
 *.py[cod]
 
+# Local datasets and shared bundles are managed outside git.
+data/*
+!data/README.md
+*.zip
+sdxl_lora_course_report(1).pdf
+
 # Large local model/cache/output artifacts
 models/
 outputs/

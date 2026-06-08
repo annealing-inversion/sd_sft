@@ -10,10 +10,30 @@ export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:T
 
 CONDA_PYTHON="${CONDA_PYTHON:-$PROJECT_ROOT/.conda/sdxl-lora/bin/python}"
 MODEL_DIR="${MODEL_DIR:-$PROJECT_ROOT/models/sdxl-base-1.0}"
-STYLE="${STYLE:-jojo}"
-DATA_DIR="${DATA_DIR:-$PROJECT_ROOT/data/$STYLE}"
+STYLE="${STYLE:-ghibli}"
+
+case "$STYLE" in
+  ghibli)
+    DEFAULT_DATA_DIR="$PROJECT_ROOT/data/Ghibli"
+    DEFAULT_PLACEHOLDER_TOKEN="<ghibli_headshot>"
+    ;;
+  persona_5)
+    DEFAULT_DATA_DIR="$PROJECT_ROOT/data/persona_5"
+    DEFAULT_PLACEHOLDER_TOKEN="<persona_5_headshot>"
+    ;;
+  eva_rei)
+    DEFAULT_DATA_DIR="$PROJECT_ROOT/data/EVA_rei"
+    DEFAULT_PLACEHOLDER_TOKEN="<eva_rei_headshot>"
+    ;;
+  *)
+    DEFAULT_DATA_DIR="$PROJECT_ROOT/data/$STYLE"
+    DEFAULT_PLACEHOLDER_TOKEN="<${STYLE}_headshot>"
+    ;;
+esac
+
+DATA_DIR="${DATA_DIR:-$DEFAULT_DATA_DIR}"
 OUTPUT_DIR="${OUTPUT_DIR:-$PROJECT_ROOT/outputs/sdxl_lora/$STYLE}"
-PLACEHOLDER_TOKEN="${PLACEHOLDER_TOKEN:-<${STYLE}_headshot>}"
+PLACEHOLDER_TOKEN="${PLACEHOLDER_TOKEN:-$DEFAULT_PLACEHOLDER_TOKEN}"
 DEFAULT_CAPTION="${DEFAULT_CAPTION:-anime portrait, close-up face, character headshot}"
 NUM_PROCESSES="${NUM_PROCESSES:-3}"
 MAIN_PROCESS_PORT="${MAIN_PROCESS_PORT:-29500}"

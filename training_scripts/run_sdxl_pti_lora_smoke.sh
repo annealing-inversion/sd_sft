@@ -10,7 +10,7 @@ export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:T
 
 CONDA_PYTHON="${CONDA_PYTHON:-$PROJECT_ROOT/.conda/sdxl-lora/bin/python}"
 MODEL_DIR="${MODEL_DIR:-$PROJECT_ROOT/models/sdxl-base-1.0}"
-DATA_DIR="${DATA_DIR:-$PROJECT_ROOT/data}"
+DATA_DIR="${DATA_DIR:-$PROJECT_ROOT/data/Ghibli}"
 OUTPUT_DIR="${OUTPUT_DIR:-$PROJECT_ROOT/outputs/sdxl_lora_smoke}"
 PLACEHOLDER_TOKEN="${PLACEHOLDER_TOKEN:-<smoke_headshot>}"
 
