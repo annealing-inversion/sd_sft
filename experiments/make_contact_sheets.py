@@ -471,6 +471,193 @@ def make_generalization_6col_sheet(
     sheet.save(output_path, quality=92)
 
 
+def make_multitoken_prompt_sheet(
+    records: list[dict[str, Any]],
+    output_path: Path,
+    *,
+    image_path: Callable[[dict[str, Any]], Path],
+    thumb_size: int = 240,
+    margin: int = 14,
+) -> None:
+    records = [record for record in records if record["experiment_id"] == "multitoken_merge"]
+    if not records:
+        return
+
+    title_font = load_font(30, bold=True)
+    role_font = load_font(20, bold=True)
+    prompt_font = load_font(12)
+
+    roles = ordered_values([(record.get("metadata") or {}).get("role") for record in records], ROLE_ORDER)
+    roles = [role for role in roles if role is not None]
+    seeds = ordered_values([record["seed"] for record in records])
+
+    record_lookup: dict[tuple[str, int], dict[str, Any]] = {}
+    prompt_lookup: dict[str, str] = {}
+    for record in records:
+        role = (record.get("metadata") or {}).get("role")
+        if role is None:
+            continue
+        record_lookup[(role, record["seed"])] = record
+        prompt_lookup[role] = record["prompt"]
+
+    title_height = 52
+    header_height = 44
+    probe = Image.new("RGB", (10, 10), "white")
+    probe_draw = ImageDraw.Draw(probe)
+    max_prompt_lines = 1
+    for prompt in prompt_lookup.values():
+        max_prompt_lines = max(max_prompt_lines, len(wrap_text_pixels(probe_draw, prompt, prompt_font, thumb_size - 18)))
+    prompt_line_height = 15
+    prompt_height = max(74, max_prompt_lines * prompt_line_height + 16)
+
+    width = margin * 2 + len(roles) * thumb_size
+    height = margin * 2 + title_height + header_height + len(seeds) * (thumb_size + prompt_height)
+    sheet = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    draw.text((margin, margin + 4), "5.5 Multi-token Merge Control", fill="#111111", font=title_font)
+
+    x0 = margin
+    header_y = margin + title_height
+    grid_y = header_y + header_height
+
+    for role_idx, role in enumerate(roles):
+        cx0 = x0 + role_idx * thumb_size
+        cx1 = cx0 + thumb_size
+        draw.rectangle((cx0, header_y, cx1, grid_y), fill="#eeeeee", outline="#c9c9c9")
+        draw_centered_text(draw, (cx0, header_y, cx1, grid_y), ROLE_LABELS.get(role, role), role_font)
+
+    current_y = grid_y
+    for seed in seeds:
+        image_y = current_y
+        prompt_y = image_y + thumb_size
+
+        for role_idx, role in enumerate(roles):
+            cx0 = x0 + role_idx * thumb_size
+            cx1 = cx0 + thumb_size
+            draw.rectangle((cx0, image_y, cx1, image_y + thumb_size), outline="#d0d0d0")
+            record = record_lookup.get((role, seed))
+            if record is not None:
+                paste_image(sheet, image_path(record), (cx0 + 2, image_y + 2, cx1 - 2, image_y + thumb_size - 2))
+
+        for role_idx, role in enumerate(roles):
+            cx0 = x0 + role_idx * thumb_size
+            cx1 = cx0 + thumb_size
+            draw.rectangle((cx0, prompt_y, cx1, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
+            y = prompt_y + 7
+            for line in wrap_text_pixels(draw, prompt_lookup.get(role, ""), prompt_font, thumb_size - 18):
+                draw.text((cx0 + 8, y), line, fill="#222222", font=prompt_font)
+                y += prompt_line_height
+
+        current_y += thumb_size + prompt_height
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(output_path, quality=92)
+
+
+def make_merge_weights_8col_sheet(
+    records: list[dict[str, Any]],
+    output_path: Path,
+    *,
+    image_path: Callable[[dict[str, Any]], Path],
+    thumb_size: int = 188,
+    margin: int = 14,
+) -> None:
+    records = [record for record in records if record["experiment_id"] == "merge_weights"]
+    if not records:
+        return
+
+    title_font = load_font(30, bold=True)
+    variant_font = load_font(19, bold=True)
+    seed_font = load_font(16, bold=True)
+    prompt_font = load_font(16)
+
+    variants = ordered_values([(record.get("metadata") or {}).get("merge_variant") for record in records], MERGE_VARIANT_ORDER)
+    variants = [variant for variant in variants if variant is not None]
+    roles = ordered_values([(record.get("metadata") or {}).get("role") for record in records], ROLE_ORDER)
+    roles = [role for role in roles if role is not None]
+    seeds = ordered_values([record["seed"] for record in records])
+
+    record_lookup: dict[tuple[str, str, int], dict[str, Any]] = {}
+    prompt_lookup: dict[str, str] = {}
+    for record in records:
+        metadata = record.get("metadata") or {}
+        variant = metadata.get("merge_variant")
+        role = metadata.get("role")
+        if variant is None or role is None:
+            continue
+        record_lookup[(variant, role, record["seed"])] = record
+        prompt_lookup[role] = record["prompt"]
+
+    title_height = 52
+    variant_header_height = 42
+    seed_header_height = 34
+    col_count = len(variants) * len(seeds)
+
+    probe = Image.new("RGB", (10, 10), "white")
+    probe_draw = ImageDraw.Draw(probe)
+    max_prompt_lines = 1
+    prompt_width = col_count * thumb_size - 18
+    for prompt in prompt_lookup.values():
+        max_prompt_lines = max(max_prompt_lines, len(wrap_text_pixels(probe_draw, prompt, prompt_font, prompt_width)))
+    prompt_line_height = 20
+    prompt_height = max(46, max_prompt_lines * prompt_line_height + 16)
+
+    width = margin * 2 + col_count * thumb_size
+    height = (
+        margin * 2
+        + title_height
+        + variant_header_height
+        + seed_header_height
+        + len(roles) * (thumb_size + prompt_height)
+    )
+    sheet = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    draw.text((margin, margin + 4), "5.6 Merge Weight Ratio Sensitivity", fill="#111111", font=title_font)
+
+    x0 = margin
+    variant_y = margin + title_height
+    seed_y = variant_y + variant_header_height
+    grid_y = seed_y + seed_header_height
+
+    for variant_idx, variant in enumerate(variants):
+        gx0 = x0 + variant_idx * len(seeds) * thumb_size
+        gx1 = gx0 + len(seeds) * thumb_size
+        draw.rectangle((gx0, variant_y, gx1, seed_y), fill="#f1f1f1", outline="#c9c9c9")
+        draw_centered_text(draw, (gx0, variant_y, gx1, seed_y), MERGE_VARIANT_LABELS.get(variant, variant), variant_font)
+        for seed_idx, seed in enumerate(seeds):
+            cx0 = gx0 + seed_idx * thumb_size
+            cx1 = cx0 + thumb_size
+            draw.rectangle((cx0, seed_y, cx1, grid_y), fill="#eeeeee", outline="#c9c9c9")
+            draw_centered_text(draw, (cx0, seed_y, cx1, grid_y), str(seed), seed_font)
+
+    current_y = grid_y
+    for role in roles:
+        image_y = current_y
+        prompt_y = image_y + thumb_size
+
+        for variant_idx, variant in enumerate(variants):
+            for seed_idx, seed in enumerate(seeds):
+                cx0 = x0 + (variant_idx * len(seeds) + seed_idx) * thumb_size
+                cx1 = cx0 + thumb_size
+                draw.rectangle((cx0, image_y, cx1, image_y + thumb_size), outline="#d0d0d0")
+                record = record_lookup.get((variant, role, seed))
+                if record is not None:
+                    paste_image(sheet, image_path(record), (cx0 + 2, image_y + 2, cx1 - 2, image_y + thumb_size - 2))
+
+        draw.rectangle((x0, prompt_y, x0 + col_count * thumb_size, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
+        y = prompt_y + 7
+        for line in wrap_text_pixels(draw, prompt_lookup.get(role, ""), prompt_font, prompt_width):
+            draw.text((x0 + 8, y), line, fill="#222222", font=prompt_font)
+            y += prompt_line_height
+
+        current_y += thumb_size + prompt_height
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(output_path, quality=92)
+
+
 def group_by_style(records: list[dict[str, Any]], experiment_id: str) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for record in records:
@@ -542,42 +729,14 @@ def build_report_sheets(records: list[dict[str, Any]], output_dir: Path, metadat
 
     multitoken = [record for record in records if record["experiment_id"] == "multitoken_merge"]
     if multitoken:
-        path = output_dir / "multitoken_merge.jpg"
-        make_matrix_sheet(
-            multitoken,
-            path,
-            title="Multi-token Merge Control",
-            row_key=lambda r: r["seed"],
-            row_label=seed_label,
-            col_key=lambda r: (r.get("metadata") or {}).get("role"),
-            col_label=lambda key: ROLE_LABELS.get(key, str(key)),
-            image_path=image_path,
-            col_order=ROLE_ORDER,
-            thumb_size=thumb_size,
-            row_label_width=150,
-        )
+        path = output_dir / "multitoken_merge_prompts.jpg"
+        make_multitoken_prompt_sheet(multitoken, path, image_path=image_path)
         outputs.append(path)
 
     merge_weights = [record for record in records if record["experiment_id"] == "merge_weights"]
-    roles = ordered_values([(record.get("metadata") or {}).get("role") for record in merge_weights], ROLE_ORDER)
-    for role in roles:
-        if role is None:
-            continue
-        group = [record for record in merge_weights if (record.get("metadata") or {}).get("role") == role]
-        path = output_dir / f"merge_weights_{role}.jpg"
-        make_matrix_sheet(
-            group,
-            path,
-            title=f"Merge Weights: {ROLE_LABELS.get(role, role)}",
-            row_key=lambda r: (r.get("metadata") or {}).get("merge_variant"),
-            row_label=lambda key: MERGE_VARIANT_LABELS.get(key, str(key)),
-            col_key=lambda r: r["seed"],
-            col_label=seed_label,
-            image_path=image_path,
-            row_order=MERGE_VARIANT_ORDER,
-            thumb_size=thumb_size,
-            row_label_width=180,
-        )
+    if merge_weights:
+        path = output_dir / "merge_weights_8col.jpg"
+        make_merge_weights_8col_sheet(merge_weights, path, image_path=image_path)
         outputs.append(path)
 
     write_index(outputs, output_dir)

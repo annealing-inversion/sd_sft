@@ -45,7 +45,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 run_plan tasks: 144
 metadata images: 144
 generated PNG files: 144
-report figures: 13 contact sheets in reports/figures/
+report figures: 10 contact sheets in reports/figures/
 ```
 
 报告已根据本轮结果图完成分析。当前仓库内报告图包括：
@@ -55,8 +55,8 @@ reports/figures/base_vs_single_6col.jpg
 reports/figures/scale_sweep_{ghibli,persona_5,eva_rei}.jpg
 reports/figures/checkpoint_dynamics_{ghibli,persona_5,eva_rei}.jpg
 reports/figures/generalization_6col.jpg
-reports/figures/multitoken_merge.jpg
-reports/figures/merge_weights_{rei_only,rei_on_persona,rei_on_ghibli,general_portrait}.jpg
+reports/figures/multitoken_merge_prompts.jpg
+reports/figures/merge_weights_8col.jpg
 ```
 
 原始生成产物仍保留在本地输出目录，可用于重新挑图或排查。注意：`outputs/` 下的元数据可能包含运行机器上的绝对路径，不要提交这些文件：

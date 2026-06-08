@@ -202,9 +202,9 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 <eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei ...
 ```
 
-结果图：
+结果图中每列表示一个 token 组合，每个 seed 的图片下方标注对应 prompt。
 
-![Multi-token merge control](figures/multitoken_merge.jpg)
+![Multi-token merge control](figures/multitoken_merge_prompts.jpg)
 
 | 组合 | Rei 身份保留 | 风格迁移 | 问题 |
 |---|---|---|---|
@@ -229,15 +229,9 @@ persona-heavy = 0.2 / 0.6 / 0.2
 rei-heavy = 0.2 / 0.2 / 0.6
 ```
 
-结果图按 prompt role 拆分。图中行表示 merge 权重，列表示 seed。
+结果图采用 8 列布局：4 个 merge 权重设置，每个权重设置包含两个 seed；每一行图片下方标注对应 prompt。
 
-![Merge weights: Rei only](figures/merge_weights_rei_only.jpg)
-
-![Merge weights: Rei + Persona](figures/merge_weights_rei_on_persona.jpg)
-
-![Merge weights: Rei + Ghibli](figures/merge_weights_rei_on_ghibli.jpg)
-
-![Merge weights: general prompt](figures/merge_weights_general_portrait.jpg)
+![Merge weight ratio sensitivity](figures/merge_weights_8col.jpg)
 
 | 权重设置 | Rei only | Rei on Persona 5 | Rei on Ghibli | 结论 |
 |---|---|---|---|---|
