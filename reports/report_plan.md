@@ -14,7 +14,7 @@
 - [x] 完成子实验 dry-run 验证：`EXPERIMENTS=multitoken_merge SEED_BASE=2222` 时计划包含 10 张图。
 - [x] 跑完整实验并生成图片：`SEED_BASE=20260608`，共 144 张 PNG，6 张实验 contact sheet 和 1 个 index。
 - [x] 根据生成图填写每个实验的观察表。
-- [x] 使用 6 张 contact sheet 作为报告主图索引，不把生成图片提交到仓库。
+- [x] 使用 6 张 contact sheet 作为报告主图，并复制到 `reports/figures/` 供 Markdown 直接嵌入。
 - [x] 写最终结论并清理占位内容。
 
 ## 当前实验产物
@@ -48,7 +48,18 @@ generated PNG files: 144
 contact sheets: base_vs_single, scale_sweep, checkpoint_dynamics, generalization, multitoken_merge, merge_weights
 ```
 
-报告已根据本轮 contact sheet 完成结果分析。正式提交课程作业时，可以从下面 6 张图中挑选需要插入最终 PDF 或展示页的主图：
+报告已根据本轮 contact sheet 完成结果分析，并把 6 张报告图复制到仓库内：
+
+```text
+reports/figures/base_vs_single.jpg
+reports/figures/scale_sweep.jpg
+reports/figures/checkpoint_dynamics.jpg
+reports/figures/generalization.jpg
+reports/figures/multitoken_merge.jpg
+reports/figures/merge_weights.jpg
+```
+
+原始生成产物仍保留在本地输出目录，可用于重新挑图或排查：
 
 ```text
 outputs/report_experiments/seed_20260608/contact_sheets/base_vs_single.jpg

@@ -101,11 +101,13 @@ W' = W + scale * B @ A
 SEED_BASE=20260608 WIDTH=1024 HEIGHT=1024 STEPS=30 bash experiments/run_report_experiments.sh
 ```
 
-结果 contact sheet 位于：
+原始推理产物位于：
 
 ```text
 outputs/report_experiments/seed_20260608/contact_sheets/
 ```
+
+为方便直接阅读 Markdown，报告中使用的 6 张 contact sheet 已复制到 `reports/figures/` 并在对应实验小节中嵌入。
 
 ## 5. 实验结果
 
@@ -115,9 +117,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/base_vs_single.jpg
-```
+![Original SDXL vs single LoRA](figures/base_vs_single.jpg)
 
 | 对比 | 观察 | 结论 |
 |---|---|---|
@@ -137,9 +137,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/base_vs_single.jpg
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/scale_sweep.jpg
-```
+![LoRA scale sensitivity](figures/scale_sweep.jpg)
 
 | 风格 | 推荐 scale | 观察 |
 |---|---:|---|
@@ -161,9 +159,7 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/checkpoint_dynamics.jpg
-```
+![Checkpoint dynamics](figures/checkpoint_dynamics.jpg)
 
 | 风格 | 早期 checkpoint | 中后期 checkpoint | final |
 |---|---|---|---|
@@ -179,9 +175,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/checkpoint_dynamics.jpg
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/generalization.jpg
-```
+![Cross-prompt generalization](figures/generalization.jpg)
 
 | 风格 | In-domain 表现 | Out-of-domain 表现 | 泛化结论 |
 |---|---|---|---|
@@ -202,9 +196,7 @@ outputs/report_experiments/seed_20260608/contact_sheets/generalization.jpg
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/multitoken_merge.jpg
-```
+![Multi-token merge control](figures/multitoken_merge.jpg)
 
 | 组合 | Rei 身份保留 | 风格迁移 | 问题 |
 |---|---|---|---|
@@ -231,9 +223,7 @@ rei-heavy = 0.2 / 0.2 / 0.6
 
 结果图：
 
-```text
-outputs/report_experiments/seed_20260608/contact_sheets/merge_weights.jpg
-```
+![Merge weight ratio sensitivity](figures/merge_weights.jpg)
 
 | 权重设置 | Rei only | Rei on Persona 5 | Rei on Ghibli | 结论 |
 |---|---|---|---|---|
