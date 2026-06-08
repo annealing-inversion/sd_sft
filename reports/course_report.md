@@ -107,7 +107,7 @@ SEED_BASE=20260608 WIDTH=1024 HEIGHT=1024 STEPS=30 bash experiments/run_report_e
 outputs/report_experiments/seed_20260608/contact_sheets/
 ```
 
-为方便直接阅读 Markdown，报告中使用的 6 张 contact sheet 已复制到 `reports/figures/` 并在对应实验小节中嵌入。
+为方便直接阅读 Markdown，报告中使用的 17 张结果图已生成到 `reports/figures/` 并在对应实验小节中嵌入。图中的标签只保留关键变量；完整 prompt 定义见 `experiments/report_prompts.json`。
 
 ## 5. 实验结果
 
@@ -115,9 +115,13 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 
 目的：比较 base SDXL 和单风格 LoRA 在相同 prompt 和 seed 下的差异。
 
-结果图：
+结果图按风格拆分。图中列表示 `Base SDXL` 和 `LoRA`，行标签只保留 prompt 类型和 seed。
 
-![Original SDXL vs single LoRA](figures/base_vs_single.jpg)
+![Base SDXL vs LoRA: Ghibli](figures/base_vs_single_ghibli.jpg)
+
+![Base SDXL vs LoRA: Persona 5](figures/base_vs_single_persona_5.jpg)
+
+![Base SDXL vs LoRA: EVA Rei](figures/base_vs_single_eva_rei.jpg)
 
 | 对比 | 观察 | 结论 |
 |---|---|---|
@@ -135,9 +139,13 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 0.4 / 0.55 / 0.65 / 0.75 / 0.9
 ```
 
-结果图：
+结果图按风格拆分。图中列表示 `lora_scale`，行表示 seed。
 
-![LoRA scale sensitivity](figures/scale_sweep.jpg)
+![LoRA scale sweep: Ghibli](figures/scale_sweep_ghibli.jpg)
+
+![LoRA scale sweep: Persona 5](figures/scale_sweep_persona_5.jpg)
+
+![LoRA scale sweep: EVA Rei](figures/scale_sweep_eva_rei.jpg)
 
 | 风格 | 推荐 scale | 观察 |
 |---|---:|---|
@@ -157,9 +165,13 @@ outputs/report_experiments/seed_20260608/contact_sheets/
 checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint-1800 / final
 ```
 
-结果图：
+结果图按风格拆分。图中列按训练顺序排列 checkpoint，行表示 seed。
 
-![Checkpoint dynamics](figures/checkpoint_dynamics.jpg)
+![Checkpoint dynamics: Ghibli](figures/checkpoint_dynamics_ghibli.jpg)
+
+![Checkpoint dynamics: Persona 5](figures/checkpoint_dynamics_persona_5.jpg)
+
+![Checkpoint dynamics: EVA Rei](figures/checkpoint_dynamics_eva_rei.jpg)
 
 | 风格 | 早期 checkpoint | 中后期 checkpoint | final |
 |---|---|---|---|
@@ -173,9 +185,13 @@ checkpoint-200 / checkpoint-600 / checkpoint-1000 / checkpoint-1400 / checkpoint
 
 目的：比较 in-domain 和 out-of-domain prompt，判断 LoRA 是否只记住训练集构图。
 
-结果图：
+结果图按风格拆分。图中列表示 in-domain 和 out-of-domain prompt，行表示 seed。
 
-![Cross-prompt generalization](figures/generalization.jpg)
+![Cross-prompt generalization: Ghibli](figures/generalization_ghibli.jpg)
+
+![Cross-prompt generalization: Persona 5](figures/generalization_persona_5.jpg)
+
+![Cross-prompt generalization: EVA Rei](figures/generalization_eva_rei.jpg)
 
 | 风格 | In-domain 表现 | Out-of-domain 表现 | 泛化结论 |
 |---|---|---|---|
@@ -221,9 +237,15 @@ persona-heavy = 0.2 / 0.6 / 0.2
 rei-heavy = 0.2 / 0.2 / 0.6
 ```
 
-结果图：
+结果图按 prompt role 拆分。图中行表示 merge 权重，列表示 seed。
 
-![Merge weight ratio sensitivity](figures/merge_weights.jpg)
+![Merge weights: Rei only](figures/merge_weights_rei_only.jpg)
+
+![Merge weights: Rei + Persona](figures/merge_weights_rei_on_persona.jpg)
+
+![Merge weights: Rei + Ghibli](figures/merge_weights_rei_on_ghibli.jpg)
+
+![Merge weights: general prompt](figures/merge_weights_general_portrait.jpg)
 
 | 权重设置 | Rei only | Rei on Persona 5 | Rei on Ghibli | 结论 |
 |---|---|---|---|---|
