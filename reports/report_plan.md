@@ -1,20 +1,21 @@
 # Report Plan
 
-这份文件是给组员和 Codex 用的报告写作计划。它可以记录实验流程、图片排版、复现路径和注意事项；正式报告正文放在 `reports/course_report.md`，只保留报告口吻的技术解释、实验结果和结论。
+这份文件是给组员和 Codex 用的报告写作计划。它可以记录实验流程、图片排版、复现路径和注意事项；每个人自己的正式报告正文通常放在本地 `reports/course_report.md`，只保留报告口吻的技术解释、实验结果和结论。
 
 ## 1. 当前状态
 
 报告主题已经确定为：SDXL 小样本动漫人物关键词与风格关键词 LoRA 的可控性、泛化和合并实验。
 
-当前报告已经完成：
+仓库内保留的是可复现实验和写作流程，不保留任何人的成品报告。当前公开文件包括：
 
-- `reports/course_report.md`：正式课程报告。
 - `experiments/report_prompts.json`：统一 prompt 与实验定义。
 - `experiments/run_report_experiments.sh`：一键生成报告实验图。
 - `experiments/make_contact_sheets.py`：把实验输出整理成报告图。
-- `reports/figures/`：已嵌入报告的图片。
+- `reports/report_plan.md`：报告写作计划。
 
-本轮报告实验只包含推理和 LoRA merge，不包含新的训练。训练参数只作为技术路线和已完成模型的背景信息写入报告。
+`reports/course_report.md` 和 `reports/figures/` 是每个组员自己的本地私有产物，已经被 `.gitignore` 忽略。不要把自己的报告和报告图提交到仓库，避免和其他组员的报告混在一起。
+
+本轮报告实验只包含推理和 LoRA merge，不包含新的训练。训练参数只作为技术路线和已完成模型的背景信息写入各自报告。
 
 ## 2. 写作边界
 
@@ -59,10 +60,10 @@
 | Seeds | `SEED_BASE`, `SEED_BASE + 1` |
 | Scheduler | `DPMSolverMultistepScheduler` |
 
-当前报告使用的主 seed 是：
+建议每个组员选择自己的主 seed，例如学号后四位或日期加学号后四位：
 
 ```text
-SEED_BASE=20260608
+SEED_BASE=<your_seed>
 ```
 
 组员要生成不同图片时，只改 `SEED_BASE`，不要改实验结构。这样报告结果不完全相同，但仍然可比较。
@@ -106,9 +107,9 @@ merge_weights
 
 脚本会先生成需要的 merged LoRA，再调用 `experiments/generate_report_images.py` 出图，最后调用 `experiments/make_contact_sheets.py` 生成 contact sheets。
 
-## 5. 当前报告图
+## 5. 报告图产物
 
-报告正文嵌入这些图：
+生成报告后，通常会把这些图复制或生成到本地 `reports/figures/`，再嵌入本地 `reports/course_report.md`。这些文件默认不提交：
 
 ```text
 reports/figures/base_vs_single_6col.jpg
@@ -241,7 +242,7 @@ rei-heavy = 0.2 / 0.2 / 0.6
 - 是否解释了为什么使用 SDXL、PTI warmup、LoRA 和 multi-token merge。
 - 是否明确说明本轮报告实验不包含新的训练。
 - 是否写出了训练参数和推理参数。
-- 是否嵌入了结果图片，而不是只给图片路径。
+- 是否在本地报告中嵌入了结果图片，而不是只给图片路径。
 - 是否删除了占位符、TODO、调试过程和 Codex 指令式文本。
 - 是否避免了“每列表示”“每行表示”“图片下方标注”这类排版说明。
 - 是否没有出现服务器主机名、SSH alias、远程绝对路径或本机用户名路径。
@@ -275,7 +276,8 @@ PY
 - `outputs/` 下的原始生成图片和 metadata。
 - `.cache/`、`.conda/`、模型权重。
 - 包含服务器路径、SSH alias、用户名路径的笔记。
-- 临时对比图，除非已经决定放入 `reports/figures/` 并在报告中使用。
+- `reports/course_report.md` 和 `reports/figures/` 下的个人报告产物。
+- 临时对比图和中间可视化结果。
 
 如果为了自己记录远程运行信息，需要放到本地私有文件，先确认文件被 `.gitignore` 忽略。
 
@@ -284,17 +286,17 @@ PY
 继续修改报告时，可以直接这样说：
 
 ```text
-请阅读 reports/report_plan.md 和 reports/course_report.md，检查报告正文是否还有工作日志口吻、排版说明或私人路径，并直接修正。
+请阅读 reports/report_plan.md 和本地 reports/course_report.md，检查报告正文是否还有工作日志口吻、排版说明或私人路径，并直接修正。不要提交 course_report.md 和 reports/figures/。
 ```
 
 重新生成不同 seed 的报告图时：
 
 ```text
-请用 SEED_BASE=你的种子 WIDTH=1024 HEIGHT=1024 STEPS=30 运行 experiments/run_report_experiments.sh，生成新的 report figures，然后根据图片更新 reports/course_report.md。不要把 outputs/ 或任何服务器信息提交到仓库。
+请用 SEED_BASE=你的种子 WIDTH=1024 HEIGHT=1024 STEPS=30 运行 experiments/run_report_experiments.sh，生成新的 report figures，然后根据图片更新本地 reports/course_report.md。不要把 outputs/、reports/course_report.md、reports/figures/ 或任何服务器信息提交到仓库。
 ```
 
 只改某个实验图时：
 
 ```text
-请只重跑 EXPERIMENTS=generalization，并把新的 contact sheet 更新到 reports/figures/，然后同步修改 reports/course_report.md 中对应小节的观察表。
+请只重跑 EXPERIMENTS=generalization，并把新的 contact sheet 更新到本地 reports/figures/，然后同步修改本地 reports/course_report.md 中对应小节的观察表。不要提交这些本地报告产物。
 ```

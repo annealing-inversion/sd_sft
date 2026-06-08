@@ -17,6 +17,11 @@ local_runs/
 remote_runs/
 reports/private/
 
+# Personal course report drafts and generated report figures.
+# Each member should create their own local report instead of sharing one.
+reports/course_report.md
+reports/figures/
+
 # Large local model/cache/output artifacts
 models/
 outputs/
