@@ -13,9 +13,9 @@
 - [x] 完成 dry-run 验证：`SEED_BASE=1234` 时完整计划包含 144 张图，使用种子 `1234` 和 `1235`。
 - [x] 完成子实验 dry-run 验证：`EXPERIMENTS=multitoken_merge SEED_BASE=2222` 时计划包含 10 张图。
 - [x] 跑完整实验并生成图片：`SEED_BASE=20260608`，共 144 张 PNG，6 张实验 contact sheet 和 1 个 index。
-- [ ] 根据生成图填写每个实验的观察表。
-- [ ] 从 contact sheet 中挑选报告主图。
-- [ ] 写最终结论并清理 TODO。
+- [x] 根据生成图填写每个实验的观察表。
+- [x] 使用 6 张 contact sheet 作为报告主图索引，不把生成图片提交到仓库。
+- [x] 写最终结论并清理占位内容。
 
 ## 当前实验产物
 
@@ -46,6 +46,17 @@ run_plan tasks: 144
 metadata images: 144
 generated PNG files: 144
 contact sheets: base_vs_single, scale_sweep, checkpoint_dynamics, generalization, multitoken_merge, merge_weights
+```
+
+报告已根据本轮 contact sheet 完成结果分析。正式提交课程作业时，可以从下面 6 张图中挑选需要插入最终 PDF 或展示页的主图：
+
+```text
+outputs/report_experiments/seed_20260608/contact_sheets/base_vs_single.jpg
+outputs/report_experiments/seed_20260608/contact_sheets/scale_sweep.jpg
+outputs/report_experiments/seed_20260608/contact_sheets/checkpoint_dynamics.jpg
+outputs/report_experiments/seed_20260608/contact_sheets/generalization.jpg
+outputs/report_experiments/seed_20260608/contact_sheets/multitoken_merge.jpg
+outputs/report_experiments/seed_20260608/contact_sheets/merge_weights.jpg
 ```
 
 ## 推荐 Codex 指令
