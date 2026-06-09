@@ -1,59 +1,32 @@
 {
-  "schema_version": 1,
-  "description": "Prompt and variant definitions for the SDXL anime portrait LoRA course report.",
+  "schema_version": 2,
+  "description": "Prompt and variant definitions for the SDXL LoRA course report using the five local datasets.",
   "styles": {
-    "ghibli": {
-      "label": "Ghibli style",
-      "lora_dir": "outputs/sdxl_lora/ghibli",
-      "token": "<ghibli_headshot>"
+    "EVA_rei": {
+      "label": "EVA Rei",
+      "lora_dir": "outputs/sdxl_lora/EVA_rei",
+      "token": "<EVA_rei_style>"
     },
-    "persona_5": {
-      "label": "Persona 5 style",
-      "lora_dir": "outputs/sdxl_lora/persona_5",
-      "token": "<persona_5_headshot>"
+    "Ghibli": {
+      "label": "Ghibli",
+      "lora_dir": "outputs/sdxl_lora/Ghibli",
+      "token": "<Ghibli_style>"
     },
-    "eva_rei": {
-      "label": "Ayanami Rei identity",
-      "lora_dir": "outputs/sdxl_lora/eva_rei",
-      "token": "<eva_rei_headshot>"
-    }
-  },
-  "merge_variants": {
-    "equal": {
-      "label": "equal 1:1:1",
-      "lora_dir": "outputs/sdxl_lora/report_merge_equal_keep",
-      "weights": {
-        "ghibli": 1.0,
-        "persona_5": 1.0,
-        "eva_rei": 1.0
-      }
+    "cardcaptor_sakura": {
+      "label": "Cardcaptor Sakura",
+      "lora_dir": "outputs/sdxl_lora/cardcaptor_sakura",
+      "token": "<cardcaptor_sakura_style>"
     },
-    "ghibli_heavy": {
-      "label": "ghibli-heavy 0.6/0.2/0.2",
-      "lora_dir": "outputs/sdxl_lora/report_merge_ghibli_heavy_keep",
-      "weights": {
-        "ghibli": 0.6,
-        "persona_5": 0.2,
-        "eva_rei": 0.2
-      }
+    "mahou_shoujo_madoka_magica": {
+      "label": "Madoka Magica",
+      "lora_dir": "outputs/sdxl_lora/mahou_shoujo_madoka_magica",
+      "token": "<mahou_shoujo_madoka_magica_style>"
     },
-    "persona_heavy": {
-      "label": "persona-heavy 0.2/0.6/0.2",
-      "lora_dir": "outputs/sdxl_lora/report_merge_persona_heavy_keep",
-      "weights": {
-        "ghibli": 0.2,
-        "persona_5": 0.6,
-        "eva_rei": 0.2
-      }
-    },
-    "rei_heavy": {
-      "label": "rei-heavy 0.2/0.2/0.6",
-      "lora_dir": "outputs/sdxl_lora/report_merge_rei_heavy_keep",
-      "weights": {
-        "ghibli": 0.2,
-        "persona_5": 0.2,
-        "eva_rei": 0.6
-      }
+    "nier_automata": {
+      "label": "NieR:Automata",
+      "lora_dir": "outputs/sdxl_lora/nier_automata",
+      "token": "<nier_automata_style>",
+      "default_lora_scale": 0.9
     }
   },
   "experiments": {
@@ -61,40 +34,64 @@
       "title": "Original SDXL vs single LoRA",
       "prompts": [
         {
-          "prompt_id": "ghibli_forest",
-          "style": "ghibli",
-          "base_prompt": "close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style",
-          "lora_prompt": "<ghibli_headshot>, close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style"
-        },
-        {
-          "prompt_id": "ghibli_sky",
-          "style": "ghibli",
-          "base_prompt": "close-up portrait of a teenage anime character under a blue sky, gentle cinematic lighting",
-          "lora_prompt": "<ghibli_headshot>, close-up portrait of a teenage anime character under a blue sky, gentle cinematic lighting"
-        },
-        {
-          "prompt_id": "persona_thief",
-          "style": "persona_5",
-          "base_prompt": "close-up portrait of a stylish anime thief, red and black graphic poster background, sharp cel shading",
-          "lora_prompt": "<persona_5_headshot>, close-up portrait of a stylish anime thief, red and black graphic poster background, sharp cel shading"
-        },
-        {
-          "prompt_id": "persona_school",
-          "style": "persona_5",
-          "base_prompt": "black haired anime boy in a school uniform, dramatic red shadow behind him, bold graphic colors",
-          "lora_prompt": "<persona_5_headshot>, black haired anime boy in a school uniform, dramatic red shadow behind him, bold graphic colors"
-        },
-        {
-          "prompt_id": "rei_plugsuit",
-          "style": "eva_rei",
+          "prompt_id": "eva_rei_plugsuit",
+          "style": "EVA_rei",
           "base_prompt": "close-up portrait of Ayanami Rei with blue hair and red eyes wearing a white plugsuit, clean classic anime style",
-          "lora_prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei with blue hair and red eyes wearing a white plugsuit, clean classic anime style"
+          "lora_prompt": "<EVA_rei_style>, close-up portrait of Ayanami Rei with blue hair and red eyes wearing a white plugsuit, clean classic anime style"
         },
         {
-          "prompt_id": "rei_uniform",
-          "style": "eva_rei",
-          "base_prompt": "Ayanami Rei in a school uniform, calm expression, pale background, clean anime character art",
-          "lora_prompt": "<eva_rei_headshot>, Ayanami Rei in a school uniform, calm expression, pale background, clean anime character art"
+          "prompt_id": "eva_rei_winter",
+          "style": "EVA_rei",
+          "base_prompt": "Ayanami Rei wearing a black winter coat in a snowy city street, blue hair, red eyes, calm expression",
+          "lora_prompt": "<EVA_rei_style>, Ayanami Rei wearing a black winter coat in a snowy city street, blue hair, red eyes, calm expression"
+        },
+        {
+          "prompt_id": "ghibli_forest",
+          "style": "Ghibli",
+          "base_prompt": "close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style",
+          "lora_prompt": "<Ghibli_style>, close-up portrait of a young anime girl in a soft forest background, warm hand painted animation style"
+        },
+        {
+          "prompt_id": "ghibli_airship",
+          "style": "Ghibli",
+          "base_prompt": "teenage anime character inside a cozy airship workshop, brass tools, cloudy sky outside, soft painterly lighting",
+          "lora_prompt": "<Ghibli_style>, teenage anime character inside a cozy airship workshop, brass tools, cloudy sky outside, soft painterly lighting"
+        },
+        {
+          "prompt_id": "sakura_portrait",
+          "style": "cardcaptor_sakura",
+          "base_prompt": "magical girl portrait, wing-shaped hair ornaments, bright green eyes, soft smile, clean anime line art",
+          "lora_prompt": "<cardcaptor_sakura_style>, magical girl portrait, wing-shaped hair ornaments, bright green eyes, soft smile, clean anime line art"
+        },
+        {
+          "prompt_id": "sakura_wand",
+          "style": "cardcaptor_sakura",
+          "base_prompt": "close-up portrait of a magical girl holding a star wand, sparkling magical aura, warm golden light, classic shoujo anime style",
+          "lora_prompt": "<cardcaptor_sakura_style>, close-up portrait of a magical girl holding a star wand, sparkling magical aura, warm golden light, classic shoujo anime style"
+        },
+        {
+          "prompt_id": "madoka_portrait",
+          "style": "mahou_shoujo_madoka_magica",
+          "base_prompt": "magical girl anime portrait, expressive eyes, pink and pastel color palette, clean character illustration",
+          "lora_prompt": "<mahou_shoujo_madoka_magica_style>, magical girl anime portrait, expressive eyes, pink and pastel color palette, clean character illustration"
+        },
+        {
+          "prompt_id": "madoka_action",
+          "style": "mahou_shoujo_madoka_magica",
+          "base_prompt": "magical girl action scene, floating ribbons, glowing weapon, dramatic night sky, vivid cel shaded anime style",
+          "lora_prompt": "<mahou_shoujo_madoka_magica_style>, magical girl action scene, floating ribbons, glowing weapon, dramatic night sky, vivid cel shaded anime style"
+        },
+        {
+          "prompt_id": "nier_portrait",
+          "style": "nier_automata",
+          "base_prompt": "close-up portrait of Nier, white short hair, black blindfold, black and white tactical clothing, serious expression",
+          "lora_prompt": "<nier_automata_style>, close-up portrait of Nier, white short hair, black blindfold, black and white tactical clothing, serious expression"
+        },
+        {
+          "prompt_id": "nier_city",
+          "style": "nier_automata",
+          "base_prompt": "full body portrait of Nier standing in a ruined city, white short hair, black blindfold, black dress, cinematic lighting",
+          "lora_prompt": "<nier_automata_style>, full body portrait of Nier standing in a ruined city, white short hair, black blindfold, black dress, cinematic lighting"
         }
       ]
     },
@@ -103,19 +100,29 @@
       "scales": [0.4, 0.55, 0.65, 0.75, 0.9],
       "prompts": [
         {
+          "prompt_id": "eva_rei_representative",
+          "style": "EVA_rei",
+          "prompt": "<EVA_rei_style>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean classic anime style"
+        },
+        {
           "prompt_id": "ghibli_representative",
-          "style": "ghibli",
-          "prompt": "<ghibli_headshot>, close-up anime portrait, soft forest background, warm hand painted lighting"
+          "style": "Ghibli",
+          "prompt": "<Ghibli_style>, close-up anime portrait, soft forest background, warm hand painted lighting"
         },
         {
-          "prompt_id": "persona_representative",
-          "style": "persona_5",
-          "prompt": "<persona_5_headshot>, red haired anime thief in a black outfit, bold red and black graphic poster background"
+          "prompt_id": "sakura_representative",
+          "style": "cardcaptor_sakura",
+          "prompt": "<cardcaptor_sakura_style>, magical girl holding a star wand, sparkling aura, classic shoujo anime style"
         },
         {
-          "prompt_id": "rei_representative",
-          "style": "eva_rei",
-          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean classic anime style"
+          "prompt_id": "madoka_representative",
+          "style": "mahou_shoujo_madoka_magica",
+          "prompt": "<mahou_shoujo_madoka_magica_style>, magical girl portrait, glowing weapon, pastel colors, dramatic anime lighting"
+        },
+        {
+          "prompt_id": "nier_representative",
+          "style": "nier_automata",
+          "prompt": "<nier_automata_style>, Nier in a black and white outfit, white short hair, black blindfold, ruined city background"
         }
       ]
     },
@@ -124,19 +131,29 @@
       "checkpoints": ["checkpoint-200", "checkpoint-600", "checkpoint-1000", "checkpoint-1400", "checkpoint-1800", "final"],
       "prompts": [
         {
+          "prompt_id": "eva_rei_checkpoint",
+          "style": "EVA_rei",
+          "prompt": "<EVA_rei_style>, close-up portrait of Ayanami Rei in a white plugsuit, blue hair, red eyes"
+        },
+        {
           "prompt_id": "ghibli_checkpoint",
-          "style": "ghibli",
-          "prompt": "<ghibli_headshot>, close-up anime portrait in a green forest, warm soft animation lighting"
+          "style": "Ghibli",
+          "prompt": "<Ghibli_style>, close-up anime portrait in a green forest, warm soft animation lighting"
         },
         {
-          "prompt_id": "persona_checkpoint",
-          "style": "persona_5",
-          "prompt": "<persona_5_headshot>, close-up anime thief portrait, bold red and black graphic poster composition"
+          "prompt_id": "sakura_checkpoint",
+          "style": "cardcaptor_sakura",
+          "prompt": "<cardcaptor_sakura_style>, close-up magical girl portrait holding a star wand, classic shoujo anime style"
         },
         {
-          "prompt_id": "rei_checkpoint",
-          "style": "eva_rei",
-          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei in a white plugsuit, blue hair, red eyes"
+          "prompt_id": "madoka_checkpoint",
+          "style": "mahou_shoujo_madoka_magica",
+          "prompt": "<mahou_shoujo_madoka_magica_style>, magical girl portrait with glowing weapon, dramatic pastel anime lighting"
+        },
+        {
+          "prompt_id": "nier_checkpoint",
+          "style": "nier_automata",
+          "prompt": "<nier_automata_style>, close-up portrait of Nier, white short hair, black blindfold, black outfit, serious expression"
         }
       ]
     },
@@ -144,40 +161,64 @@
       "title": "Cross-prompt generalization",
       "prompts": [
         {
-          "prompt_id": "ghibli_in_domain",
-          "style": "ghibli",
+          "prompt_id": "eva_rei_in_domain",
+          "style": "EVA_rei",
           "domain": "in_domain",
-          "prompt": "<ghibli_headshot>, close-up portrait of a young anime girl in a green garden, soft painterly background"
+          "prompt": "<EVA_rei_style>, Ayanami Rei in a white plugsuit, calm expression, blue hair, red eyes"
+        },
+        {
+          "prompt_id": "eva_rei_out_domain",
+          "style": "EVA_rei",
+          "domain": "out_of_domain",
+          "prompt": "<EVA_rei_style>, Ayanami Rei wearing a black winter coat in a snowy city street, blue hair, red eyes"
+        },
+        {
+          "prompt_id": "ghibli_in_domain",
+          "style": "Ghibli",
+          "domain": "in_domain",
+          "prompt": "<Ghibli_style>, close-up portrait of a young anime girl in a green garden, soft painterly background"
         },
         {
           "prompt_id": "ghibli_out_domain",
-          "style": "ghibli",
+          "style": "Ghibli",
           "domain": "out_of_domain",
-          "prompt": "<ghibli_headshot>, close-up portrait of a young mechanic inside a cozy airship workshop, brass tools, cloudy sky outside, soft hand painted animation style"
+          "prompt": "<Ghibli_style>, Ghibli style portrait of a young mechanic inside a cozy airship workshop, brass tools, cloudy sky outside"
         },
         {
-          "prompt_id": "persona_in_domain",
-          "style": "persona_5",
+          "prompt_id": "sakura_in_domain",
+          "style": "cardcaptor_sakura",
           "domain": "in_domain",
-          "prompt": "<persona_5_headshot>, stylish anime thief wearing a black coat, red and black graphic background"
+          "prompt": "<cardcaptor_sakura_style>, magical girl portrait holding a star wand, bright green eyes, classic shoujo anime style"
         },
         {
-          "prompt_id": "persona_out_domain",
-          "style": "persona_5",
+          "prompt_id": "sakura_out_domain",
+          "style": "cardcaptor_sakura",
           "domain": "out_of_domain",
-          "prompt": "<persona_5_headshot>, stylish anime detective in a black coat, red gloves, neon city background, bold red and black graphic poster style"
+          "prompt": "<cardcaptor_sakura_style>, Sakura Kinomoto with short brown hair and bright green eyes, wearing a frilled magical girl outfit, holding a star wand, exploring an old library at night, floating Clow cards, candlelight, detailed shelves, classic shoujo anime style"
         },
         {
-          "prompt_id": "rei_in_domain",
-          "style": "eva_rei",
+          "prompt_id": "madoka_in_domain",
+          "style": "mahou_shoujo_madoka_magica",
           "domain": "in_domain",
-          "prompt": "<eva_rei_headshot>, Ayanami Rei in a white plugsuit, calm expression, blue hair, red eyes"
+          "prompt": "<mahou_shoujo_madoka_magica_style>, magical girl portrait, pastel outfit, glowing weapon, expressive eyes"
         },
         {
-          "prompt_id": "rei_out_domain",
-          "style": "eva_rei",
+          "prompt_id": "madoka_out_domain",
+          "style": "mahou_shoujo_madoka_magica",
           "domain": "out_of_domain",
-          "prompt": "<eva_rei_headshot>, Ayanami Rei wearing a black winter coat in a snowy city street, blue hair, red eyes"
+          "prompt": "<mahou_shoujo_madoka_magica_style>, Madoka Kaname with twin tails and a magical girl outfit, holding a glowing bow, standing in a futuristic train station, neon signs, dramatic perspective, pastel anime colors, emotional magical girl atmosphere"
+        },
+        {
+          "prompt_id": "nier_in_domain",
+          "style": "nier_automata",
+          "domain": "in_domain",
+          "prompt": "<nier_automata_style>, Nier in black and white tactical clothing, white short hair, black blindfold, serious expression"
+        },
+        {
+          "prompt_id": "nier_out_domain",
+          "style": "nier_automata",
+          "domain": "out_of_domain",
+          "prompt": "<nier_automata_style>, Nier walking through a rainy cyberpunk street, white short hair, black blindfold, black coat, neon reflections"
         }
       ]
     },
@@ -188,55 +229,179 @@
         {
           "prompt_id": "merge_rei_only",
           "role": "rei_only",
-          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean classic anime style"
-        },
-        {
-          "prompt_id": "merge_persona_only",
-          "role": "persona_only",
-          "prompt": "<persona_5_headshot>, close-up anime thief portrait, red and black graphic poster style"
+          "prompt": "<EVA_rei_style>, close-up portrait of Ayanami Rei, short pale blue hair, red eyes, white plugsuit, calm expression, clean anime lighting"
         },
         {
           "prompt_id": "merge_ghibli_only",
           "role": "ghibli_only",
-          "prompt": "<ghibli_headshot>, close-up anime portrait, soft forest background, warm hand painted style"
+          "prompt": "<Ghibli_style>, Ghibli style portrait of a young traveler, soft hand painted forest background, warm natural light, gentle expressive face"
         },
         {
-          "prompt_id": "rei_on_persona",
-          "role": "rei_on_persona",
-          "prompt": "<eva_rei_headshot>, <persona_5_headshot>, Ayanami Rei as a stylish anime thief, blue hair, red eyes, red and black graphic poster style"
+          "prompt_id": "merge_sakura_only",
+          "role": "sakura_only",
+          "prompt": "<cardcaptor_sakura_style>, Sakura Kinomoto with short brown hair and bright green eyes, frilled magical girl outfit, holding a star wand, floating Clow cards, classic shoujo anime style"
         },
         {
-          "prompt_id": "rei_on_ghibli",
+          "prompt_id": "merge_madoka_only",
+          "role": "madoka_only",
+          "prompt": "<mahou_shoujo_madoka_magica_style>, Madoka Kaname with twin tails, magical girl outfit, holding a glowing bow, pastel anime colors, emotional magical girl atmosphere"
+        },
+        {
+          "prompt_id": "merge_nier_only",
+          "role": "nier_only",
+          "prompt": "<nier_automata_style>, close-up portrait of Nier, white short hair, black blindfold, black and white tactical outfit, serious expression, ruined city background"
+        },
+        {
+          "prompt_id": "merge_rei_on_ghibli",
           "role": "rei_on_ghibli",
-          "prompt": "<eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei in a soft forest background, blue hair, red eyes, warm hand painted animation style"
+          "prompt": "<EVA_rei_style> <Ghibli_style>, Ayanami Rei with short pale blue hair and red eyes, wearing a white plugsuit inside a cozy Ghibli style airship workshop, soft hand painted animation lighting"
+        },
+        {
+          "prompt_id": "merge_rei_on_sakura",
+          "role": "rei_on_sakura",
+          "prompt": "<EVA_rei_style> <cardcaptor_sakura_style>, Ayanami Rei with short pale blue hair and red eyes, wearing a frilled magical girl outfit, holding a star wand, floating Clow cards, classic shoujo anime style"
+        },
+        {
+          "prompt_id": "merge_rei_on_madoka",
+          "role": "rei_on_madoka",
+          "prompt": "<EVA_rei_style> <mahou_shoujo_madoka_magica_style>, Ayanami Rei with short pale blue hair and red eyes, wearing a magical girl outfit, holding a glowing bow, pastel dramatic anime lighting"
+        },
+        {
+          "prompt_id": "merge_rei_on_nier",
+          "role": "rei_on_nier",
+          "prompt": "<EVA_rei_style> <nier_automata_style>, Ayanami Rei with short pale blue hair and red eyes, wearing black and white Nier tactical clothing and a black blindfold, ruined city background"
         }
       ]
     },
     "merge_weights": {
       "title": "Merge weight ratio sensitivity",
-      "merge_variants": ["equal", "ghibli_heavy", "persona_heavy", "rei_heavy"],
+      "merge_variants": [
+        "ghibli_equal",
+        "ghibli_rei_heavy",
+        "ghibli_other_heavy",
+        "sakura_equal",
+        "sakura_rei_heavy",
+        "sakura_other_heavy",
+        "madoka_equal",
+        "madoka_rei_heavy",
+        "madoka_other_heavy",
+        "nier_equal",
+        "nier_rei_heavy",
+        "nier_other_heavy"
+      ],
       "prompts": [
         {
-          "prompt_id": "weights_rei_only",
-          "role": "rei_only",
-          "prompt": "<eva_rei_headshot>, close-up portrait of Ayanami Rei, blue hair, red eyes, clean anime style"
-        },
-        {
-          "prompt_id": "weights_rei_on_persona",
-          "role": "rei_on_persona",
-          "prompt": "<eva_rei_headshot>, <persona_5_headshot>, Ayanami Rei in a black thief outfit, blue hair, red eyes, bold red and black graphic poster style"
-        },
-        {
-          "prompt_id": "weights_rei_on_ghibli",
+          "prompt_id": "merge_weight_rei_on_ghibli",
           "role": "rei_on_ghibli",
-          "prompt": "<eva_rei_headshot>, <ghibli_headshot>, Ayanami Rei walking through a bright green forest, blue hair, red eyes, soft hand painted animation style"
+          "prompt": "<EVA_rei_style> <Ghibli_style>, Ayanami Rei in a cozy airship workshop, blue hair, red eyes, soft hand painted animation style"
         },
         {
-          "prompt_id": "weights_general_portrait",
-          "role": "general_portrait",
-          "prompt": "<ghibli_headshot>, <persona_5_headshot>, close-up portrait of an original anime character, energetic expression, mixed graphic and painterly style"
+          "prompt_id": "merge_weight_rei_on_sakura",
+          "role": "rei_on_sakura",
+          "prompt": "<EVA_rei_style> <cardcaptor_sakura_style>, Ayanami Rei holding a star wand, blue hair, red eyes, bright shoujo anime style"
+        },
+        {
+          "prompt_id": "merge_weight_rei_on_madoka",
+          "role": "rei_on_madoka",
+          "prompt": "<EVA_rei_style> <mahou_shoujo_madoka_magica_style>, Ayanami Rei with a glowing magical weapon, blue hair, red eyes, dramatic pastel anime lighting"
+        },
+        {
+          "prompt_id": "merge_weight_rei_on_nier",
+          "role": "rei_on_nier",
+          "prompt": "<EVA_rei_style> <nier_automata_style>, Ayanami Rei styled as Nier in black and white tactical clothing, black blindfold, blue hair, red eyes, ruined city background"
         }
       ]
+    }
+  },
+  "merge_variants": {
+    "equal": {
+      "label": "equal",
+      "lora_dir": "outputs/sdxl_lora/report_merge_equal_keep",
+      "weights": [1.0, 1.0, 1.0, 1.0, 1.0]
+    },
+    "ghibli_equal": {
+      "label": "equal",
+      "pair": "ghibli",
+      "weight_role": "equal",
+      "lora_dir": "outputs/sdxl_lora/report_merge_ghibli_equal_keep",
+      "weights": [0.5, 0.5]
+    },
+    "ghibli_rei_heavy": {
+      "label": "rei-heavy",
+      "pair": "ghibli",
+      "weight_role": "rei_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_ghibli_rei_heavy_keep",
+      "weights": [0.9, 0.1]
+    },
+    "ghibli_other_heavy": {
+      "label": "other-heavy",
+      "pair": "ghibli",
+      "weight_role": "other_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_ghibli_other_heavy_keep",
+      "weights": [0.1, 0.9]
+    },
+    "sakura_equal": {
+      "label": "equal",
+      "pair": "sakura",
+      "weight_role": "equal",
+      "lora_dir": "outputs/sdxl_lora/report_merge_sakura_equal_keep",
+      "weights": [0.5, 0.5]
+    },
+    "sakura_rei_heavy": {
+      "label": "rei-heavy",
+      "pair": "sakura",
+      "weight_role": "rei_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_sakura_rei_heavy_keep",
+      "weights": [0.9, 0.1]
+    },
+    "sakura_other_heavy": {
+      "label": "other-heavy",
+      "pair": "sakura",
+      "weight_role": "other_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_sakura_other_heavy_keep",
+      "weights": [0.1, 0.9]
+    },
+    "madoka_equal": {
+      "label": "equal",
+      "pair": "madoka",
+      "weight_role": "equal",
+      "lora_dir": "outputs/sdxl_lora/report_merge_madoka_equal_keep",
+      "weights": [0.5, 0.5]
+    },
+    "madoka_rei_heavy": {
+      "label": "rei-heavy",
+      "pair": "madoka",
+      "weight_role": "rei_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_madoka_rei_heavy_keep",
+      "weights": [0.9, 0.1]
+    },
+    "madoka_other_heavy": {
+      "label": "other-heavy",
+      "pair": "madoka",
+      "weight_role": "other_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_madoka_other_heavy_keep",
+      "weights": [0.1, 0.9]
+    },
+    "nier_equal": {
+      "label": "equal",
+      "pair": "nier",
+      "weight_role": "equal",
+      "lora_dir": "outputs/sdxl_lora/report_merge_nier_equal_keep",
+      "weights": [0.5, 0.5]
+    },
+    "nier_rei_heavy": {
+      "label": "rei-heavy",
+      "pair": "nier",
+      "weight_role": "rei_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_nier_rei_heavy_keep",
+      "weights": [0.9, 0.1]
+    },
+    "nier_other_heavy": {
+      "label": "other-heavy",
+      "pair": "nier",
+      "weight_role": "other_heavy",
+      "lora_dir": "outputs/sdxl_lora/report_merge_nier_other_heavy_keep",
+      "weights": [0.1, 0.9]
     }
   }
 }

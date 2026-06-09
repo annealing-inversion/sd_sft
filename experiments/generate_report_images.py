@@ -166,6 +166,10 @@ def style_lora_dir(config: dict[str, Any], style: str) -> str:
     return config["styles"][style]["lora_dir"]
 
 
+def style_lora_scale(config: dict[str, Any], style: str, fallback: float) -> float:
+    return float(config["styles"][style].get("default_lora_scale", fallback))
+
+
 def checkpoint_lora_dir(config: dict[str, Any], style: str, checkpoint: str) -> str:
     base_dir = style_lora_dir(config, style)
     if checkpoint == "final":
@@ -215,7 +219,7 @@ def build_tasks(config: dict[str, Any], args: argparse.Namespace) -> list[Task]:
                     item["lora_prompt"],
                     seed,
                     style_lora_dir(config, style),
-                    args.default_lora_scale,
+                    style_lora_scale(config, style, args.default_lora_scale),
                     args.width,
                     args.height,
                     args.steps,
@@ -263,7 +267,7 @@ def build_tasks(config: dict[str, Any], args: argparse.Namespace) -> list[Task]:
                         item["prompt"],
                         seed,
                         checkpoint_lora_dir(config, style, checkpoint),
-                        args.default_lora_scale,
+                        style_lora_scale(config, style, args.default_lora_scale),
                         args.width,
                         args.height,
                         args.steps,
@@ -286,7 +290,7 @@ def build_tasks(config: dict[str, Any], args: argparse.Namespace) -> list[Task]:
                     item["prompt"],
                     seed,
                     style_lora_dir(config, style),
-                    args.default_lora_scale,
+                    style_lora_scale(config, style, args.default_lora_scale),
                     args.width,
                     args.height,
                     args.steps,
@@ -323,6 +327,12 @@ def build_tasks(config: dict[str, Any], args: argparse.Namespace) -> list[Task]:
         for merge_variant in exp["merge_variants"]:
             merge_info = config["merge_variants"][merge_variant]
             for item in exp["prompts"]:
+                role = merge_info.get("role")
+                if role is not None and item["role"] != role:
+                    continue
+                pair = merge_info.get("pair")
+                if pair is not None and not item["role"].endswith(f"_{pair}"):
+                    continue
                 for seed in seeds:
                     add_task(
                         tasks,
@@ -342,6 +352,10 @@ def build_tasks(config: dict[str, Any], args: argparse.Namespace) -> list[Task]:
                         {
                             "merge_variant": merge_variant,
                             "merge_label": merge_info["label"],
+                            "pair": merge_info.get("pair"),
+                            "main_style": merge_info.get("main_style"),
+                            "other_style": merge_info.get("other_style"),
+                            "weight_role": merge_info.get("weight_role", merge_variant),
                             "weights": merge_info["weights"],
                             "role": item["role"],
                         },

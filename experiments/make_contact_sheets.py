@@ -10,20 +10,32 @@ from typing import Any, Callable, Iterable
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
-STYLE_ORDER = ["ghibli", "persona_5", "eva_rei"]
+STYLE_ORDER = [
+    "EVA_rei",
+    "Ghibli",
+    "cardcaptor_sakura",
+    "mahou_shoujo_madoka_magica",
+    "nier_automata",
+]
 STYLE_LABELS = {
-    "ghibli": "Ghibli",
-    "persona_5": "Persona 5",
-    "eva_rei": "EVA Rei",
+    "EVA_rei": "EVA Rei",
+    "Ghibli": "Ghibli",
+    "cardcaptor_sakura": "Cardcaptor Sakura",
+    "mahou_shoujo_madoka_magica": "Madoka Magica",
+    "nier_automata": "NieR:Automata",
 }
 
 PROMPT_LABELS = {
+    "eva_rei_plugsuit": "plugsuit",
+    "eva_rei_winter": "winter",
     "ghibli_forest": "forest",
-    "ghibli_sky": "sky",
-    "persona_thief": "thief",
-    "persona_school": "school",
-    "rei_plugsuit": "plugsuit",
-    "rei_uniform": "uniform",
+    "ghibli_airship": "airship",
+    "sakura_portrait": "portrait",
+    "sakura_wand": "wand",
+    "madoka_portrait": "portrait",
+    "madoka_action": "action",
+    "nier_portrait": "portrait",
+    "nier_city": "city",
 }
 
 COMPARISON_ORDER = ["base", "single_lora"]
@@ -49,27 +61,41 @@ DOMAIN_LABELS = {
 
 ROLE_ORDER = [
     "rei_only",
-    "persona_only",
     "ghibli_only",
-    "rei_on_persona",
+    "sakura_only",
+    "madoka_only",
+    "nier_only",
     "rei_on_ghibli",
-    "general_portrait",
+    "rei_on_sakura",
+    "rei_on_madoka",
+    "rei_on_nier",
+    "ghibli_on_rei",
+    "ghibli_on_sakura",
+    "ghibli_on_madoka",
+    "ghibli_on_nier",
 ]
 ROLE_LABELS = {
     "rei_only": "Rei only",
-    "persona_only": "Persona only",
     "ghibli_only": "Ghibli only",
-    "rei_on_persona": "Rei + Persona",
+    "sakura_only": "Sakura only",
+    "madoka_only": "Madoka only",
+    "nier_only": "NieR only",
     "rei_on_ghibli": "Rei + Ghibli",
-    "general_portrait": "general",
+    "rei_on_sakura": "Rei + Sakura",
+    "rei_on_madoka": "Rei + Madoka",
+    "rei_on_nier": "Rei + NieR",
+    "ghibli_on_rei": "Ghibli + Rei",
+    "ghibli_on_sakura": "Ghibli + Sakura",
+    "ghibli_on_madoka": "Ghibli + Madoka",
+    "ghibli_on_nier": "Ghibli + NieR",
 }
 
-MERGE_VARIANT_ORDER = ["equal", "ghibli_heavy", "persona_heavy", "rei_heavy"]
+MERGE_WEIGHT_ROLE_ORDER = ["equal", "main_heavy", "rei_heavy", "other_heavy"]
 MERGE_VARIANT_LABELS = {
     "equal": "equal",
-    "ghibli_heavy": "ghibli-heavy",
-    "persona_heavy": "persona-heavy",
+    "main_heavy": "main-heavy",
     "rei_heavy": "rei-heavy",
+    "other_heavy": "other-heavy",
 }
 
 
@@ -555,12 +581,13 @@ def make_multitoken_prompt_sheet(
     sheet.save(output_path, quality=92)
 
 
-def make_merge_weights_8col_sheet(
+def make_merge_weights_3col_sheet(
     records: list[dict[str, Any]],
     output_path: Path,
     *,
     image_path: Callable[[dict[str, Any]], Path],
-    thumb_size: int = 188,
+    cell_width: int = 292,
+    thumb_size: int = 136,
     margin: int = 14,
 ) -> None:
     records = [record for record in records if record["experiment_id"] == "merge_weights"]
@@ -568,12 +595,15 @@ def make_merge_weights_8col_sheet(
         return
 
     title_font = load_font(30, bold=True)
-    variant_font = load_font(19, bold=True)
+    variant_font = load_font(20, bold=True)
     seed_font = load_font(16, bold=True)
     prompt_font = load_font(16)
 
-    variants = ordered_values([(record.get("metadata") or {}).get("merge_variant") for record in records], MERGE_VARIANT_ORDER)
-    variants = [variant for variant in variants if variant is not None]
+    weight_roles = ordered_values(
+        [(record.get("metadata") or {}).get("weight_role") for record in records],
+        MERGE_WEIGHT_ROLE_ORDER,
+    )
+    weight_roles = [weight_role for weight_role in weight_roles if weight_role is not None]
     roles = ordered_values([(record.get("metadata") or {}).get("role") for record in records], ROLE_ORDER)
     roles = [role for role in roles if role is not None]
     seeds = ordered_values([record["seed"] for record in records])
@@ -582,34 +612,37 @@ def make_merge_weights_8col_sheet(
     prompt_lookup: dict[str, str] = {}
     for record in records:
         metadata = record.get("metadata") or {}
-        variant = metadata.get("merge_variant")
+        weight_role = metadata.get("weight_role")
         role = metadata.get("role")
-        if variant is None or role is None:
+        if weight_role is None or role is None:
             continue
-        record_lookup[(variant, role, record["seed"])] = record
+        record_lookup[(weight_role, role, record["seed"])] = record
         prompt_lookup[role] = record["prompt"]
 
     title_height = 52
     variant_header_height = 42
-    seed_header_height = 34
-    col_count = len(variants) * len(seeds)
+    seed_header_height = 28
+    col_count = len(weight_roles)
+    cell_inner_gap = 8
+    seeds_per_cell = max(1, len(seeds))
+    seed_thumb_size = min(thumb_size, (cell_width - cell_inner_gap * (seeds_per_cell + 1)) // seeds_per_cell)
+    image_row_height = seed_header_height + seed_thumb_size + cell_inner_gap * 2
 
     probe = Image.new("RGB", (10, 10), "white")
     probe_draw = ImageDraw.Draw(probe)
     max_prompt_lines = 1
-    prompt_width = col_count * thumb_size - 18
+    prompt_width = col_count * cell_width - 18
     for prompt in prompt_lookup.values():
         max_prompt_lines = max(max_prompt_lines, len(wrap_text_pixels(probe_draw, prompt, prompt_font, prompt_width)))
     prompt_line_height = 20
     prompt_height = max(46, max_prompt_lines * prompt_line_height + 16)
 
-    width = margin * 2 + col_count * thumb_size
+    width = margin * 2 + col_count * cell_width
     height = (
         margin * 2
         + title_height
         + variant_header_height
-        + seed_header_height
-        + len(roles) * (thumb_size + prompt_height)
+        + len(roles) * (image_row_height + prompt_height)
     )
     sheet = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(sheet)
@@ -618,41 +651,45 @@ def make_merge_weights_8col_sheet(
 
     x0 = margin
     variant_y = margin + title_height
-    seed_y = variant_y + variant_header_height
-    grid_y = seed_y + seed_header_height
+    grid_y = variant_y + variant_header_height
 
-    for variant_idx, variant in enumerate(variants):
-        gx0 = x0 + variant_idx * len(seeds) * thumb_size
-        gx1 = gx0 + len(seeds) * thumb_size
-        draw.rectangle((gx0, variant_y, gx1, seed_y), fill="#f1f1f1", outline="#c9c9c9")
-        draw_centered_text(draw, (gx0, variant_y, gx1, seed_y), MERGE_VARIANT_LABELS.get(variant, variant), variant_font)
-        for seed_idx, seed in enumerate(seeds):
-            cx0 = gx0 + seed_idx * thumb_size
-            cx1 = cx0 + thumb_size
-            draw.rectangle((cx0, seed_y, cx1, grid_y), fill="#eeeeee", outline="#c9c9c9")
-            draw_centered_text(draw, (cx0, seed_y, cx1, grid_y), str(seed), seed_font)
+    for weight_idx, weight_role in enumerate(weight_roles):
+        gx0 = x0 + weight_idx * cell_width
+        gx1 = gx0 + cell_width
+        draw.rectangle((gx0, variant_y, gx1, grid_y), fill="#f1f1f1", outline="#c9c9c9")
+        draw_centered_text(
+            draw,
+            (gx0, variant_y, gx1, grid_y),
+            MERGE_VARIANT_LABELS.get(weight_role, weight_role),
+            variant_font,
+        )
 
     current_y = grid_y
     for role in roles:
         image_y = current_y
-        prompt_y = image_y + thumb_size
+        prompt_y = image_y + image_row_height
 
-        for variant_idx, variant in enumerate(variants):
+        for weight_idx, weight_role in enumerate(weight_roles):
+            cell_x0 = x0 + weight_idx * cell_width
+            cell_x1 = cell_x0 + cell_width
+            draw.rectangle((cell_x0, image_y, cell_x1, image_y + image_row_height), outline="#d0d0d0")
             for seed_idx, seed in enumerate(seeds):
-                cx0 = x0 + (variant_idx * len(seeds) + seed_idx) * thumb_size
-                cx1 = cx0 + thumb_size
-                draw.rectangle((cx0, image_y, cx1, image_y + thumb_size), outline="#d0d0d0")
-                record = record_lookup.get((variant, role, seed))
+                cx0 = cell_x0 + cell_inner_gap + seed_idx * (seed_thumb_size + cell_inner_gap)
+                cx1 = cx0 + seed_thumb_size
+                label_y = image_y + 2
+                thumb_y0 = image_y + seed_header_height
+                draw_centered_text(draw, (cx0, label_y, cx1, thumb_y0), str(seed), seed_font)
+                record = record_lookup.get((weight_role, role, seed))
                 if record is not None:
-                    paste_image(sheet, image_path(record), (cx0 + 2, image_y + 2, cx1 - 2, image_y + thumb_size - 2))
+                    paste_image(sheet, image_path(record), (cx0, thumb_y0, cx1, thumb_y0 + seed_thumb_size))
 
-        draw.rectangle((x0, prompt_y, x0 + col_count * thumb_size, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
+        draw.rectangle((x0, prompt_y, x0 + col_count * cell_width, prompt_y + prompt_height), fill="#f7f7f7", outline="#d0d0d0")
         y = prompt_y + 7
         for line in wrap_text_pixels(draw, prompt_lookup.get(role, ""), prompt_font, prompt_width):
             draw.text((x0 + 8, y), line, fill="#222222", font=prompt_font)
             y += prompt_line_height
 
-        current_y += thumb_size + prompt_height
+        current_y += image_row_height + prompt_height
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(output_path, quality=92)
@@ -735,8 +772,8 @@ def build_report_sheets(records: list[dict[str, Any]], output_dir: Path, metadat
 
     merge_weights = [record for record in records if record["experiment_id"] == "merge_weights"]
     if merge_weights:
-        path = output_dir / "merge_weights_8col.jpg"
-        make_merge_weights_8col_sheet(merge_weights, path, image_path=image_path)
+        path = output_dir / "merge_weights_3col.jpg"
+        make_merge_weights_3col_sheet(merge_weights, path, image_path=image_path)
         outputs.append(path)
 
     write_index(outputs, output_dir)

@@ -38,10 +38,17 @@ DEFAULT_CAPTION="${DEFAULT_CAPTION:-anime portrait, close-up face, character hea
 NUM_PROCESSES="${NUM_PROCESSES:-3}"
 MAIN_PROCESS_PORT="${MAIN_PROCESS_PORT:-29500}"
 
-"$CONDA_PYTHON" -m accelerate.commands.launch \
-  --multi_gpu \
-  --num_processes "$NUM_PROCESSES" \
-  --main_process_port "$MAIN_PROCESS_PORT" \
+LAUNCH_ARGS=(
+  -m accelerate.commands.launch
+  --num_processes "$NUM_PROCESSES"
+  --main_process_port "$MAIN_PROCESS_PORT"
+)
+
+if [[ "$NUM_PROCESSES" -gt 1 ]]; then
+  LAUNCH_ARGS+=(--multi_gpu)
+fi
+
+"$CONDA_PYTHON" "${LAUNCH_ARGS[@]}" \
   training_scripts/train_sdxl_pti_lora.py \
   --pretrained-model-name-or-path "$MODEL_DIR" \
   --data-dir "$DATA_DIR" \

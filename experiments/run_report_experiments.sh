@@ -40,9 +40,9 @@ fi
 merge_variant() {
   local name="$1"
   local output_dir="$2"
-  local weight_ghibli="$3"
-  local weight_persona="$4"
-  local weight_rei="$5"
+  local other_dir="$3"
+  local weight_rei="$4"
+  local weight_other="$5"
 
   if [[ "$MAKE_MERGES" != "1" ]]; then
     return
@@ -54,12 +54,10 @@ merge_variant() {
 
   echo "merge $name -> $output_dir"
   "$CONDA_PYTHON" scripts/merge_sdxl_loras.py \
-    --lora-dir outputs/sdxl_lora/ghibli \
-    --lora-dir outputs/sdxl_lora/persona_5 \
-    --lora-dir outputs/sdxl_lora/eva_rei \
-    --weight "$weight_ghibli" \
-    --weight "$weight_persona" \
+    --lora-dir outputs/sdxl_lora/EVA_rei \
+    --lora-dir "$other_dir" \
     --weight "$weight_rei" \
+    --weight "$weight_other" \
     --normalize-weights \
     --output-dir "$output_dir" \
     --method concat \
@@ -67,10 +65,51 @@ merge_variant() {
     --save-dtype float16
 }
 
-merge_variant "equal" "outputs/sdxl_lora/report_merge_equal_keep" 1.0 1.0 1.0
-merge_variant "ghibli_heavy" "outputs/sdxl_lora/report_merge_ghibli_heavy_keep" 0.6 0.2 0.2
-merge_variant "persona_heavy" "outputs/sdxl_lora/report_merge_persona_heavy_keep" 0.2 0.6 0.2
-merge_variant "rei_heavy" "outputs/sdxl_lora/report_merge_rei_heavy_keep" 0.2 0.2 0.6
+merge_pair_variants() {
+  local pair="$1"
+  local other_dir="$2"
+
+  merge_variant "${pair}_equal" "outputs/sdxl_lora/report_merge_${pair}_equal_keep" "$other_dir" 0.5 0.5
+  merge_variant "${pair}_rei_heavy" "outputs/sdxl_lora/report_merge_${pair}_rei_heavy_keep" "$other_dir" 0.9 0.1
+  merge_variant "${pair}_other_heavy" "outputs/sdxl_lora/report_merge_${pair}_other_heavy_keep" "$other_dir" 0.1 0.9
+}
+
+merge_pair_variants "ghibli" "outputs/sdxl_lora/Ghibli"
+merge_pair_variants "sakura" "outputs/sdxl_lora/cardcaptor_sakura"
+merge_pair_variants "madoka" "outputs/sdxl_lora/mahou_shoujo_madoka_magica"
+merge_pair_variants "nier" "outputs/sdxl_lora/nier_automata"
+
+merge_all_equal() {
+  local output_dir="outputs/sdxl_lora/report_merge_equal_keep"
+
+  if [[ "$MAKE_MERGES" != "1" ]]; then
+    return
+  fi
+  if [[ "$FORCE_MERGE" != "1" && -s "$output_dir/pytorch_lora_weights.safetensors" && -s "$output_dir/learned_embeds.safetensors" ]]; then
+    echo "skip existing merge: equal -> $output_dir"
+    return
+  fi
+
+  echo "merge equal -> $output_dir"
+  "$CONDA_PYTHON" scripts/merge_sdxl_loras.py \
+    --lora-dir outputs/sdxl_lora/EVA_rei \
+    --lora-dir outputs/sdxl_lora/Ghibli \
+    --lora-dir outputs/sdxl_lora/cardcaptor_sakura \
+    --lora-dir outputs/sdxl_lora/mahou_shoujo_madoka_magica \
+    --lora-dir outputs/sdxl_lora/nier_automata \
+    --weight 1.0 \
+    --weight 1.0 \
+    --weight 1.0 \
+    --weight 1.0 \
+    --weight 1.0 \
+    --normalize-weights \
+    --output-dir "$output_dir" \
+    --method concat \
+    --embed-merge keep \
+    --save-dtype float16
+}
+
+merge_all_equal
 
 cmd=(
   "$CONDA_PYTHON" experiments/generate_report_images.py
